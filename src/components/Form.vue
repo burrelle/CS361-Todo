@@ -4,7 +4,7 @@
       <form v-on:submit="addToList">
         <label class="label">Enter a Task:</label>
         <div class="control">
-          <textarea class="textarea" placeholder="Enter your task here..." v-model="description" required></textarea>
+          <textarea id="txt-input" class="textarea" placeholder="Enter your task here..." v-model="description" required></textarea>
         </div>
         <div class="field is-grouped">
           <p class="control is-expanded">
