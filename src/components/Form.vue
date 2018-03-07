@@ -1,7 +1,7 @@
 <template>
   <div>
     <div class="field top">
-      <form v-on:submit="addToList">
+      <form v-on:submit.prevent>
         <label class="label">Enter a Task:</label>
         <div class="control">
           <textarea id="txt-input" class="textarea" placeholder="Enter your task here..." v-model="description" required></textarea>
@@ -20,12 +20,12 @@
             <div class="control">
               <div class="select">
                 <select v-model="repeat">
-                  <option value="0">Never</option>
-                  <option value="1">Every Day</option>
-                  <option value="7">Every Week</option>
-                  <option value="14">Every 2 Weeks</option>
-                  <option value="30">Every Month</option>
-                  <option value="365">Every Year</option>
+                  <option value="Never" selected="selected">Never</option>
+                  <option value="Every Day">Every Day</option>
+                  <option value="Every Week">Every Week</option>
+                  <option value="Every 2 Weeks">Every 2 Weeks</option>
+                  <option value="Every Month">Every Month</option>
+                  <option value="Every Year">Every Year</option>
                 </select>
               </div>
             </div>
@@ -33,7 +33,7 @@
         </div>
         <div class="field is-grouped">
           <p class="control">
-            <button class="button is-info">
+            <button class="button is-info" @click="addToFirebase()">
               Add Task
             </button>
           </p>
@@ -45,8 +45,8 @@
         </div>
       </form>
     </div>
-    <template v-if="!task.completed" v-for="task in tasks">
-      <div class="card">
+    <template v-if="!task.completed && !task.editing" v-for="task in tasks">
+      <div class="card" v-bind:key="task['.key']">
         <header class="card-header">
           <p class="card-header-title">
             {{ task.description }}
@@ -57,30 +57,63 @@
             <p>
               <b>Starts:</b> {{ task.startDate | moment }} -
               <b>Ends:</b> {{ task.endDate | moment }} -
-              <b>Completion {{ completeTime(task.startDate, task.endDate) }} </b>
+              <b>Completion:</b> {{ completeTime(task.startDate, task.endDate) }} -
+              <b>Repeats:</b> {{ task.repeat }}
             </p>
           </div>
         </div>
         <footer class="card-footer">
-          <a href="#" class="card-footer-item" @click="task.completed = true">Complete</a>
-          <!-- <a href="#" class="card-footer-item">Edit</a> -->
-          <a href="#" class="card-footer-item">Delete</a>
+          <a href="#" class="card-footer-item" @click="completeTask(task['.key'])">Complete</a>
+          <a href="#" class="card-footer-item" @click="setEditTask(task['.key'])">Edit</a>
+          <a href="#" class="card-footer-item" @click="deleteTask(task['.key'])">Delete</a>
         </footer>
       </div>
     </template>
+
+    <template v-if="!task.completed && task.editing" v-for="task in tasks">
+      <div class="card" v-bind:key="task['.key']">
+        <header class="card-header">
+          <p class="card-header-title">
+            <input class="input" type="text" v-model="task.description">
+          </p>
+        </header>
+        <div class="card-content">
+          <div class="content">
+              <b>Starts:</b><input class="input" type="date" v-model="task.startDate">
+              <b>Ends:</b> <input class="input" type="date" v-model="task.endDate">
+              <b>Repeats:</b><br>
+              <div class="select">
+                <select v-model="task.repeat">
+                  <option value="Never">Never</option>
+                  <option value="Every Day">Every Day</option>
+                  <option value="Every Week">Every Week</option>
+                  <option value="Every 2 Weeks">Every 2 Weeks</option>
+                  <option value="Every Month">Every Month</option>
+                  <option value="Every Year">Every Year</option>
+                </select>
+              </div>
+          </div>
+        </div>
+        <footer class="card-footer">
+          <a href="#" class="card-footer-item" @click="saveEdit(task)">Save</a>
+          <a href="#" class="card-footer-item" @click="cancelEdit(task['.key'])">Cancel</a>
+        </footer>
+      </div>
+    </template>
+
     <hr>
     <a class="button is-primary" @click="isVisable = true" v-show="!isVisable">Show Completed Tasks</a>
     <a class="button is-primary" @click="isVisable = false" v-show="isVisable">Hide Completed Tasks</a>
-    <template v-if="task.completed && isVisable" v-for="task in tasks">
-      <div class="card">
+    <template v-if="task.completed && isVisable" v-for="task in tasks" >
+      <div class="card" v-bind:key="task['.key']">
       <header class="card-header">
           <p class="card-header-title">
             {{ task.description }}
           </p>
         </header>
         <footer class="card-footer">
-          <a href="#" class="card-footer-item" @click="task.completed = false">Uncomplete</a>
-          <a href="#" class="card-footer-item">Delete</a>
+          <a href="#" class="card-footer-item" @click="uncompleteTask(task['.key'])">Uncomplete</a>
+          <a href="#" class="card-footer-item" @click="deleteTask(task['.key'])">Delete</a>
         </footer>
       </div>
     </template>
@@ -88,63 +121,96 @@
 </template>
 
 <script>
-  import moment from 'moment';
-  export default {
-    name: 'form-input',
-    data() {
-      return {
-        description: '',
-        startDate: '',
-        endDate: '',
-        repeat: 0,
-        completed: false,
-        isVisable: false,
-        tasks: []
-      }
+import moment from "moment";
+import { todosRef } from "../firebase";
+export default {
+  name: "form-input",
+  data() {
+    return {
+      description: "",
+      startDate: "",
+      endDate: "",
+      repeat: "Never",
+      completed: false,
+      isVisable: false
+    };
+  },
+
+  firebase: {
+    tasks: todosRef
+  },
+
+  methods: {
+    addToFirebase() {
+      todosRef.push({
+        description: this.description,
+        startDate: this.startDate,
+        endDate: this.endDate,
+        repeat: this.repeat,
+        completed: this.completed,
+        editing: false
+      });
+      this.description = "";
+      this.startDate = "";
+      this.endDate = "";
+      this.repeat = "";
+      this.completed = false;
+    },
+    clearList(e) {
+      this.description = "";
+      this.startDate = "";
+      this.endDate = "";
+      this.repeat = "";
+      this.completed = false;
+      e.preventDefault();
     },
 
-    methods: {
-      addToList(e) {
-        this.tasks.push({
-          description: this.description,
-          startDate: this.startDate,
-          endDate: this.endDate,
-          repeat: this.repeat,
-          completed: this.completed,
-        });
-        this.description = "";
-        this.startDate = ""
-        this.endDate = "";
-        this.repeat = 0;
-        this.complted = false;
-        e.preventDefault();
-      },
-      clearList(e) {
-        this.description = "";
-        this.startDate = ""
-        this.endDate = "";
-        this.repeat = 0;
-        this.complted = false;
-        e.preventDefault();
-      },
-
-      completeTime: (startDate, endDate) => {
-        return moment(startDate).to(moment(endDate));
-      }
+    completeTime: (startDate, endDate) => {
+      return moment(startDate).to(moment(endDate));
     },
 
-    filters: {
-      moment: (date) => {
-        return moment(date).format('MMMM Do YYYY')
-      }
+    completeTask(key) {
+      todosRef.child(key).update({ completed: true });
+    },
+
+    uncompleteTask(key) {
+      todosRef.child(key).update({ completed: false });
+    },
+
+    deleteTask(key) {
+      todosRef.child(key).remove();
+    },
+
+    setEditTask(key) {
+      todosRef.child(key).update({ editing: true });
+    },
+
+    cancelEdit(key) {
+      todosRef.child(key).update({ editing: false });
+    },
+
+    saveEdit(task) {
+      const key = task[".key"];
+      todosRef.child(key).update({
+        description: task.description,
+        startDate: task.startDate,
+        endDate: task.endDate,
+        repeat: task.repeat,
+        editing: false
+      });
+    }
+  },
+
+  filters: {
+    moment: date => {
+      return moment(date).format("MMMM Do YYYY");
     }
   }
-
+};
 </script>
 
 <style>
-  .top {
-    padding-top: 10px;
-  }
-
+.top {
+  padding-top: 10px;
+}
 </style>
