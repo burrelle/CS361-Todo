@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="form-component">
     <div class="field top">
       <form v-on:submit.prevent>
         <label class="label">Enter a Task:</label>
@@ -9,16 +9,16 @@
         <div class="field is-grouped">
           <p class="control is-expanded">
             <label class="label">Start Date:</label>
-            <input class="input" type="date" v-model="startDate" required>
+            <input class="input start-date" type="date" v-model="startDate" required>
           </p>
           <p class="control is-expanded">
             <label class="label">Expected Completion Date:</label>
-            <input class="input" type="date" v-model="endDate" required>
+            <input class="input end-date" type="date" v-model="endDate" required>
           </p>
           <div class="field">
             <label class="label">Repeat:</label>
             <div class="control">
-              <div class="select">
+              <div class="select repeat-select">
                 <select v-model="repeat">
                   <option value="Never" selected="selected">Never</option>
                   <option value="Every Day">Every Day</option>
@@ -31,14 +31,49 @@
             </div>
           </div>
         </div>
+
+        <div class="field">
+          <div class="field">
+            <label class="label">Catagory: </label>
+            <div class="control is-expanded">
+              <div class="select catagories-select">
+                <select v-model="catagory">
+                  <option value="Health">Health</option>
+                  <option value="Work">Work</option>
+                  <option value="Home">Study</option>
+                  <option value="Study">Study</option>
+                  <option value="Social">Social</option>
+                  <option value="Shopping">Shopping</option>
+                  <option value="Wish">Wish</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <div class="field">
+            <label class="label">Difficulty:</label>
+            <div class="control radio-buttons">
+              <label class="radio">
+                <input type="radio" value="Easy" v-model="difficulty" name="difficulty" checked> Easy
+              </label>
+              <label class="radio">
+                <input type="radio" value="Medium" v-model="difficulty" name="difficulty"> Medium
+              </label>
+              <label class="radio">
+                <input type="radio" value="Hard" v-model="difficulty" name="difficulty"> Hard
+              </label>
+            </div>
+          </div>
+        </div>
+
         <div class="field is-grouped">
           <p class="control">
-            <button class="button is-info" @click="addToFirebase()">
+            <button class="button is-info add-task" @click="addToFirebase()">
               Add Task
             </button>
           </p>
           <p class="control">
-            <button class="button is-danger" @click="clearList">
+            <button class="button is-danger cancel-btn" @click="clearList">
               Cancel
             </button>
           </p>
@@ -79,19 +114,22 @@
         </header>
         <div class="card-content">
           <div class="content">
-              <b>Starts:</b><input class="input" type="date" v-model="task.startDate">
-              <b>Ends:</b> <input class="input" type="date" v-model="task.endDate">
-              <b>Repeats:</b><br>
-              <div class="select">
-                <select v-model="task.repeat">
-                  <option value="Never">Never</option>
-                  <option value="Every Day">Every Day</option>
-                  <option value="Every Week">Every Week</option>
-                  <option value="Every 2 Weeks">Every 2 Weeks</option>
-                  <option value="Every Month">Every Month</option>
-                  <option value="Every Year">Every Year</option>
-                </select>
-              </div>
+            <b>Starts:</b>
+            <input class="input" type="date" v-model="task.startDate">
+            <b>Ends:</b>
+            <input class="input" type="date" v-model="task.endDate">
+            <b>Repeats:</b>
+            <br>
+            <div class="select">
+              <select v-model="task.repeat">
+                <option value="Never">Never</option>
+                <option value="Every Day">Every Day</option>
+                <option value="Every Week">Every Week</option>
+                <option value="Every 2 Weeks">Every 2 Weeks</option>
+                <option value="Every Month">Every Month</option>
+                <option value="Every Year">Every Year</option>
+              </select>
+            </div>
           </div>
         </div>
         <footer class="card-footer">
@@ -102,11 +140,11 @@
     </template>
 
     <hr>
-    <a class="button is-primary" @click="isVisable = true" v-show="!isVisable">Show Completed Tasks</a>
-    <a class="button is-primary" @click="isVisable = false" v-show="isVisable">Hide Completed Tasks</a>
-    <template v-if="task.completed && isVisable" v-for="task in tasks" >
+    <a class="button is-primary show-hide" @click="isVisable = true" v-show="!isVisable">Show Completed Tasks</a>
+    <a class="button is-primary show-hide" @click="isVisable = false" v-show="isVisable">Hide Completed Tasks</a>
+    <template v-if="task.completed && isVisable" v-for="task in tasks">
       <div class="card" v-bind:key="task['.key']">
-      <header class="card-header">
+        <header class="card-header">
           <p class="card-header-title">
             {{ task.description }}
           </p>
@@ -121,96 +159,112 @@
 </template>
 
 <script>
-import moment from "moment";
-import { todosRef } from "../firebase";
-export default {
-  name: "form-input",
-  data() {
-    return {
-      description: "",
-      startDate: "",
-      endDate: "",
-      repeat: "Never",
-      completed: false,
-      isVisable: false
-    };
-  },
-
-  firebase: {
-    tasks: todosRef
-  },
-
-  methods: {
-    addToFirebase() {
-      todosRef.push({
-        description: this.description,
-        startDate: this.startDate,
-        endDate: this.endDate,
-        repeat: this.repeat,
-        completed: this.completed,
-        editing: false
-      });
-      this.description = "";
-      this.startDate = "";
-      this.endDate = "";
-      this.repeat = "";
-      this.completed = false;
-    },
-    clearList(e) {
-      this.description = "";
-      this.startDate = "";
-      this.endDate = "";
-      this.repeat = "";
-      this.completed = false;
-      e.preventDefault();
+  import moment from "moment";
+  import {
+    todosRef
+  } from "../firebase";
+  export default {
+    name: "form-input",
+    data() {
+      return {
+        description: "",
+        startDate: "",
+        endDate: "",
+        repeat: "Never",
+        catagory: "Health",
+        difficulty: "Easy",
+        completed: false,
+        isVisable: false
+      };
     },
 
-    completeTime: (startDate, endDate) => {
-      return moment(startDate).to(moment(endDate));
+    firebase: {
+      tasks: todosRef
     },
 
-    completeTask(key) {
-      todosRef.child(key).update({ completed: true });
+    methods: {
+      addToFirebase() {
+        todosRef.push({
+          description: this.description,
+          startDate: this.startDate,
+          endDate: this.endDate,
+          repeat: this.repeat,
+          completed: this.completed,
+          catagory: this.catagory,
+          difficulty: this.difficulty,
+          editing: false
+        });
+        this.description = "";
+        this.startDate = "";
+        this.endDate = "";
+        this.repeat = "";
+        this.completed = false;
+      },
+      clearList(e) {
+        this.description = "";
+        this.startDate = "";
+        this.endDate = "";
+        this.repeat = "";
+        this.completed = false;
+        e.preventDefault();
+      },
+
+      completeTime: (startDate, endDate) => {
+        return moment(startDate).to(moment(endDate));
+      },
+
+      completeTask(key) {
+        todosRef.child(key).update({
+          completed: true
+        });
+      },
+
+      uncompleteTask(key) {
+        todosRef.child(key).update({
+          completed: false
+        });
+      },
+
+      deleteTask(key) {
+        todosRef.child(key).remove();
+      },
+
+      setEditTask(key) {
+        todosRef.child(key).update({
+          editing: true
+        });
+      },
+
+      cancelEdit(key) {
+        todosRef.child(key).update({
+          editing: false
+        });
+      },
+
+      saveEdit(task) {
+        const key = task[".key"];
+        todosRef.child(key).update({
+          description: task.description,
+          startDate: task.startDate,
+          endDate: task.endDate,
+          repeat: task.repeat,
+          editing: false
+        });
+      }
     },
 
-    uncompleteTask(key) {
-      todosRef.child(key).update({ completed: false });
-    },
-
-    deleteTask(key) {
-      todosRef.child(key).remove();
-    },
-
-    setEditTask(key) {
-      todosRef.child(key).update({ editing: true });
-    },
-
-    cancelEdit(key) {
-      todosRef.child(key).update({ editing: false });
-    },
-
-    saveEdit(task) {
-      const key = task[".key"];
-      todosRef.child(key).update({
-        description: task.description,
-        startDate: task.startDate,
-        endDate: task.endDate,
-        repeat: task.repeat,
-        editing: false
-      });
+    filters: {
+      moment: date => {
+        return moment(date).format("MMMM Do YYYY");
+      }
     }
-  },
+  };
 
-  filters: {
-    moment: date => {
-      return moment(date).format("MMMM Do YYYY");
-    }
-  }
-};
 </script>
 
 <style>
-.top {
-  padding-top: 10px;
-}
+  .top {
+    padding-top: 10px;
+  }
+
 </style>
