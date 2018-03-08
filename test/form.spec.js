@@ -53,5 +53,16 @@ describe("Form Component", () => {
     expect(wrapper.find(".show-hide").exists()).toBe(true);
   });
 
-  // TODO: Verify default values of repeat, catagory, and difficulty
+  it("repeat has a default value of never", () => {
+    expect(wrapper.find("#repeat-select-default").text()).toBe("Never");
+  });
+
+  it("catagory has a default value of health", () => {
+    expect(wrapper.find("#catagory-default").text()).toBe("Health");
+  });
+
+  it("can add a description in the text box", () => {
+    wrapper.setData({ description: "Mocha testing task" });
+    expect(wrapper.find("#txt-input").element.value).toBe("Mocha testing task")
+  });
 });

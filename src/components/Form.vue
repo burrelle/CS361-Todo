@@ -20,7 +20,7 @@
             <div class="control">
               <div class="select repeat-select">
                 <select v-model="repeat">
-                  <option value="Never" selected="selected">Never</option>
+                  <option value="Never" id="repeat-select-default">Never</option>
                   <option value="Every Day">Every Day</option>
                   <option value="Every Week">Every Week</option>
                   <option value="Every 2 Weeks">Every 2 Weeks</option>
@@ -38,9 +38,9 @@
             <div class="control is-expanded">
               <div class="select catagories-select">
                 <select v-model="catagory">
-                  <option value="Health">Health</option>
+                  <option value="Health" id="catagory-default">Health</option>
                   <option value="Work">Work</option>
-                  <option value="Home">Study</option>
+                  <option value="Home">Home</option>
                   <option value="Study">Study</option>
                   <option value="Social">Social</option>
                   <option value="Shopping">Shopping</option>
@@ -95,6 +95,10 @@
               <b>Completion:</b> {{ completeTime(task.startDate, task.endDate) }} -
               <b>Repeats:</b> {{ task.repeat }}
             </p>
+            <p>
+              <b>Catagory:</b> {{ task.catagory }}</p>
+            <p>
+              <b>Difficulty:</b> {{ task.difficulty }} </p>
           </div>
         </div>
         <footer class="card-footer">
@@ -130,6 +134,31 @@
                 <option value="Every Year">Every Year</option>
               </select>
             </div>
+            <br>
+            <b>Catagory:</b>
+            <br>
+            <div class="select">
+              <select v-model="task.catagory">
+                <option value="Health" id="catagory-default">Health</option>
+                <option value="Work">Work</option>
+                <option value="Home">Home</option>
+                <option value="Study">Study</option>
+                <option value="Social">Social</option>
+                <option value="Shopping">Shopping</option>
+                <option value="Wish">Wish</option>
+              </select>
+            </div>
+            <br>
+            <b>Difficulty:</b>
+            <br>
+            <div class="select">
+              <select v-model="task.difficulty">
+                <option value="Easy">Easy</option>
+                <option value="Medium">Medium</option>
+                <option value="Hard">Hard</option>
+              </select>
+            </div>
+
           </div>
         </div>
         <footer class="card-footer">
@@ -248,6 +277,8 @@
           startDate: task.startDate,
           endDate: task.endDate,
           repeat: task.repeat,
+          catagory: task.catagory,
+          difficulty: task.difficulty,
           editing: false
         });
       }
