@@ -1,5 +1,6 @@
 <template>
-  <div class="form-component">
+  <!-- TODO: Add a logout button -->
+  <div class="form-component container">
     <div class="field top">
       <form v-on:submit.prevent>
         <label class="label">Enter a Task:</label>
@@ -293,7 +294,7 @@
 
 </script>
 
-<style>
+<style scoped>
   .top {
     padding-top: 10px;
   }
