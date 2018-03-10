@@ -63,6 +63,6 @@ describe("Form Component", () => {
 
   it("can add a description in the text box", () => {
     wrapper.setData({ description: "Mocha testing task" });
-    expect(wrapper.find("#txt-input").element.value).toBe("Mocha testing task")
+    expect(wrapper.find("#txt-input").element.value).toBe("Mocha testing task");
   });
 });

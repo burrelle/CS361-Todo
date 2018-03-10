@@ -1,17 +1,16 @@
 <template>
-  <div class="container">
-    <form-input></form-input>
+  <div id="app">
+    <div class="container">
+      <router-view/>
+    </div>
   </div>
 </template>
 
 <script>
-import formInput from "./components/Form.vue";
 export default {
-  name: 'app', 
-  components: { formInput }
+  name: 'App'
 }
 </script>
 
 <style>
-
 </style>
