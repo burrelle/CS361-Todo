@@ -1,7 +1,18 @@
 <template>
-  <!-- TODO: Add a logout button -->
-  <div class="form-component container">
-    <div class="field top">
+  <div class="form-component container top">
+    <div class="field is-grouped is-grouped-right">
+       <p class="control">
+        <a class="button is-light">
+          {{ emailAddress }}
+        </a>
+      </p>
+      <p class="control">
+        <a class="button is-primary" @click="logout">
+          Logout
+        </a>
+      </p>
+    </div>
+    <div class="field">
       <form v-on:submit.prevent>
         <label class="label">Enter a Task:</label>
         <div class="control">
@@ -189,114 +200,135 @@
 </template>
 
 <script>
-import moment from "moment";
-import { todosRef } from "../firebase";
-export default {
-  name: "form-input",
-  data() {
-    return {
-      description: "",
-      startDate: "",
-      endDate: "",
-      repeat: "Never",
-      catagory: "Health",
-      difficulty: "Easy",
-      completed: false,
-      isVisable: false
-    };
-  },
-
-  firebase: {
-    tasks: todosRef
-  },
-
-  methods: {
-    addToFirebase() {
-      todosRef.push({
-        description: this.description,
-        startDate: this.startDate,
-        endDate: this.endDate,
-        repeat: this.repeat,
-        completed: this.completed,
-        catagory: this.catagory,
-        difficulty: this.difficulty,
-        editing: false
-      });
-      this.description = "";
-      this.startDate = "";
-      this.endDate = "";
-      this.repeat = "Never";
-      this.catagory = "Health"; 
-      this.difficulty = "Easy";
-      this.completed = false;
-    },
-    clearList(e) {
-      this.description = "";
-      this.startDate = "";
-      this.endDate = "";
-      this.repeat = "Never";
-      this.completed = false;
-      this.catagory = "Health"; 
-      this.difficulty = "Easy";
-      e.preventDefault();
+  import moment from "moment";
+  import {
+    todosRef
+  } from "../firebase";
+  import firebase from 'firebase';
+  import router from '../router'
+  export default {
+    name: "form-input",
+    data() {
+      return {
+        description: "",
+        startDate: "",
+        endDate: "",
+        repeat: "Never",
+        catagory: "Health",
+        difficulty: "Easy",
+        completed: false,
+        isVisable: false
+      };
     },
 
-    completeTime: (startDate, endDate) => {
-      return moment(startDate).to(moment(endDate));
+    firebase: {
+      tasks: todosRef
     },
 
-    completeTask(key) {
-      todosRef.child(key).update({
-        completed: true
-      });
+    methods: {
+      addToFirebase() {
+        todosRef.push({
+          description: this.description,
+          startDate: this.startDate,
+          endDate: this.endDate,
+          repeat: this.repeat,
+          completed: this.completed,
+          catagory: this.catagory,
+          difficulty: this.difficulty,
+          editing: false
+        });
+        this.description = "";
+        this.startDate = "";
+        this.endDate = "";
+        this.repeat = "Never";
+        this.catagory = "Health";
+        this.difficulty = "Easy";
+        this.completed = false;
+      },
+      clearList(e) {
+        this.description = "";
+        this.startDate = "";
+        this.endDate = "";
+        this.repeat = "Never";
+        this.completed = false;
+        this.catagory = "Health";
+        this.difficulty = "Easy";
+        e.preventDefault();
+      },
+
+      completeTime: (startDate, endDate) => {
+        return moment(startDate).to(moment(endDate));
+      },
+
+      completeTask(key) {
+        todosRef.child(key).update({
+          completed: true
+        });
+      },
+
+      uncompleteTask(key) {
+        todosRef.child(key).update({
+          completed: false
+        });
+      },
+
+      deleteTask(key) {
+        todosRef.child(key).remove();
+      },
+
+      setEditTask(key) {
+        todosRef.child(key).update({
+          editing: true
+        });
+      },
+
+      cancelEdit(key) {
+        todosRef.child(key).update({
+          editing: false
+        });
+      },
+
+      saveEdit(task) {
+        const key = task[".key"];
+        todosRef.child(key).update({
+          description: task.description,
+          startDate: task.startDate,
+          endDate: task.endDate,
+          repeat: task.repeat,
+          catagory: task.catagory,
+          difficulty: task.difficulty,
+          editing: false
+        });
+      }, 
+
+      logout() {
+        firebase.auth().signOut().then(() => {
+          router.push('login')
+        })
+      }
+    },
+    
+    computed: {
+      emailAddress: () => {
+        var user = firebase.auth().currentUser;
+        if(user){
+           return user.email;
+        }
+      }
     },
 
-    uncompleteTask(key) {
-      todosRef.child(key).update({
-        completed: false
-      });
-    },
-
-    deleteTask(key) {
-      todosRef.child(key).remove();
-    },
-
-    setEditTask(key) {
-      todosRef.child(key).update({
-        editing: true
-      });
-    },
-
-    cancelEdit(key) {
-      todosRef.child(key).update({
-        editing: false
-      });
-    },
-
-    saveEdit(task) {
-      const key = task[".key"];
-      todosRef.child(key).update({
-        description: task.description,
-        startDate: task.startDate,
-        endDate: task.endDate,
-        repeat: task.repeat,
-        catagory: task.catagory,
-        difficulty: task.difficulty,
-        editing: false
-      });
+    filters: {
+      moment: date => {
+        return moment(date).format("MMMM Do YYYY");
+      }
     }
-  },
+  };
 
-  filters: {
-    moment: date => {
-      return moment(date).format("MMMM Do YYYY");
-    }
-  }
-};
 </script>
 
 <style scoped>
-.top {
-  padding-top: 10px;
-}
+  .top {
+    padding-top: 10px;
+  }
+
 </style>

@@ -48,6 +48,8 @@
 
 <script>
 import firebase from "firebase";
+import router from "../router";
+import swal from "sweetalert";
 export default {
   name: "Login",
   data() {
@@ -63,10 +65,15 @@ export default {
         .signInWithEmailAndPassword(this.email, this.password)
         .then(
           user => {
-            alert("Sign in succesful");
+            router.push("todo");
           },
           err => {
-            alert(err.message);
+            swal({
+              title: "Login Unsuccesful",
+              text: err.message,
+              icon: "error",
+              button: "Close"
+            });
           }
         );
     }

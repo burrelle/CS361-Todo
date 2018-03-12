@@ -48,6 +48,7 @@
 
 <script>
 import firebase from "firebase";
+import router from '../router';
 export default {
   name: "SignUp",
   data() {
@@ -63,10 +64,15 @@ export default {
         .createUserWithEmailAndPassword(this.email, this.password)
         .then(
           user => {
-            alert("User created");
+            router.push('todo');
           },
           err => {
-            alert(err.message);
+            swal({
+              title: "Sign Up Unsuccessful",
+              text: err.message,
+              icon: "error",
+              button: "Close"
+            });
           }
         );
     }
