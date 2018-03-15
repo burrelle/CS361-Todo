@@ -16,20 +16,22 @@ describe("Login Component", () => {
     expect(wrapper.is(".login-component")).toEqual(true);
   });
 
-  it('has a title of a better todo', () => {
+  it("has a title of a better todo", () => {
     expect(wrapper.find(".title").text()).toBe("A Better Todo");
   });
 
-  it('has a subtitle of login', () => {
+  it("has a subtitle of login", () => {
     expect(wrapper.find(".subtitle").text()).toBe("Login");
-  })
+  });
 
   it("can add an email", () => {
     wrapper.setData({ email: "example@example.com" });
-    expect(wrapper.find(".email-input").element.value).toBe("example@example.com");
+    expect(wrapper.find(".email-input").element.value).toBe(
+      "example@example.com"
+    );
   });
 
-  it("can add an password", () => {
+  it("can add a password", () => {
     wrapper.setData({ password: "password" });
     expect(wrapper.find(".password-input").element.value).toBe("password");
   });
