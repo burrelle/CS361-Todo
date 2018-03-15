@@ -1,8 +1,8 @@
 import Vue from 'vue'
 import Router from 'vue-router'
-import Form from '@/components/Form'
-import Login from '@/components/Login'
-import SignUp from '@/components/SignUp'
+import Form from '../components/Form'
+import Login from '../components/Login'
+import SignUp from '../components/SignUp'
 import firebase from 'firebase'
 
 Vue.use(Router)

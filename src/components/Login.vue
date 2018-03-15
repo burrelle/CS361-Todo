@@ -1,5 +1,5 @@
 <template>
-    <div class="box-padding-top">
+  <div class="login-component box-padding-top">
   <div class="box">
     <section class="hero is-primary">
       <div class="hero-body">
@@ -16,7 +16,7 @@
     <hr>
     <div class="field">
       <p class="control has-icons-left">
-        <input class="input" type="email" placeholder="Email" v-model="email">
+        <input class="email-input" type="email" placeholder="Email" v-model="email">
         <span class="icon is-small is-left">
           <i class="fas fa-envelope"></i>
         </span>
@@ -24,7 +24,7 @@
     </div>
     <div class="field">
       <p class="control has-icons-left">
-        <input class="input" type="password" placeholder="Password" v-model="password">
+        <input class="password-input" type="password" placeholder="Password" v-model="password">
         <span class="icon is-small is-left">
           <i class="fas fa-lock"></i>
         </span>
@@ -32,11 +32,11 @@
     </div>
     <div class="field">
       <p class="control">
-        <button class="button is-primary" @click="signIn">
+        <button class="button is-primary login-btn" @click="signIn">
           Login
         </button>
         <router-link to="/sign-up">
-          <button class="button is-info">
+          <button class="button is-info create-btn">
             Create Account
           </button>
         </router-link>
