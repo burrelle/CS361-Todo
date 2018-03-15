@@ -1,8 +1,13 @@
 <template>
   <div class="form-component container top">
     <div class="field is-grouped is-grouped-right">
+      <p class="control">
+        <a class="button is-light" disabled>
+        <i class="fas fa-user-circle"></i>
+        </a>
+       </p>
        <p class="control">
-        <a class="button is-light">
+        <a class="button is-light" disabled>
           {{ emailAddress }}
         </a>
       </p>
