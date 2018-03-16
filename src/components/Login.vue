@@ -16,7 +16,7 @@
     <hr>
     <div class="field">
       <p class="control has-icons-left">
-        <input class="email-input" type="email" placeholder="Email" v-model="email">
+        <input class="input email-input" type="email" placeholder="Email" v-model="email">
         <span class="icon is-small is-left">
           <i class="fas fa-envelope"></i>
         </span>
@@ -24,7 +24,7 @@
     </div>
     <div class="field">
       <p class="control has-icons-left">
-        <input class="password-input" type="password" placeholder="Password" v-model="password">
+        <input class="input password-input" type="password" placeholder="Password" v-model="password">
         <span class="icon is-small is-left">
           <i class="fas fa-lock"></i>
         </span>

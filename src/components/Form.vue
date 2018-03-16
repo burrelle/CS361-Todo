@@ -3,10 +3,10 @@
     <div class="field is-grouped is-grouped-right">
       <p class="control">
         <a class="button is-light" disabled>
-        <i class="fas fa-user-circle"></i>
+          <i class="fas fa-user-circle"></i>
         </a>
-       </p>
-       <p class="control">
+      </p>
+      <p class="control">
         <a class="button is-light" disabled>
           {{ emailAddress }}
         </a>
@@ -207,7 +207,8 @@
 <script>
   import moment from "moment";
   import {
-    todosRef
+    todosRef,
+    avatarRef
   } from "../firebase";
   import firebase from 'firebase';
   import router from '../router'
@@ -227,7 +228,8 @@
     },
 
     firebase: {
-      tasks: todosRef
+      tasks: todosRef,
+      avatar: avatarRef
     },
 
     methods: {
@@ -304,20 +306,19 @@
           difficulty: task.difficulty,
           editing: false
         });
-      }, 
+      },
 
       logout() {
         firebase.auth().signOut().then(() => {
           router.push('login')
         })
-      }
+      },
     },
-    
     computed: {
       emailAddress: () => {
         var user = firebase.auth().currentUser;
-        if(user){
-           return user.email;
+        if (user) {
+          return user.email;
         }
       }
     },
